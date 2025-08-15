@@ -1,0 +1,68 @@
+[
+  {
+    "label": "Gemstone Crabs",
+    "value": "action:531065172",
+    "description": "Click this to get a link to the video!",
+    "emoji": {
+      "id": "1399993487964901496",
+      "name": "combat",
+      "animated": false
+    },
+    "url": "https://youtu.be/ca5_u6m3Jfw"
+  },
+  {
+    "label": "Guardians of the Rift",
+    "value": "action:677786165",
+    "description": "Click this to get a link to the video!",
+    "emoji": {
+      "id": "1399994221141692467",
+      "name": "runecraft",
+      "animated": false
+    },
+    "url": "https://youtu.be/mrhmdR6IYvY"
+  },
+  {
+    "label": "Stall Thieving",
+    "value": "action:stall_thieving_1754362956139",
+    "description": "Click this to get a link to the video!",
+    "emoji": {
+      "id": "1399994035933810781",
+      "name": "thieving",
+      "animated": false
+    },
+    "url": "https://youtu.be/puY5XTM-w8w?si=rAdghddX57hvMmYZ"
+  },
+  {
+    "label": "Wintertodt",
+    "value": "action:wintertodt_1755055451664",
+    "description": "Completes the wintertdot minigame!",
+    "emoji": {
+      "id": "1399993692135096402",
+      "name": "firemaking",
+      "animated": false
+    },
+    "url": "https://youtu.be/kIUQ5g4yTR0"
+  },
+  {
+    "label": "Agility",
+    "value": "action:agility_1755055611655",
+    "description": "Click to see the video!",
+    "emoji": {
+      "id": "1399993431803297812",
+      "name": "agility",
+      "animated": false
+    },
+    "url": "https://youtu.be/C8U3Vgu4PKc"
+  },
+  {
+    "label": "Woodcutter",
+    "value": "action:woodcutter_1755055665081",
+    "description": "Click to see the video!",
+    "emoji": {
+      "id": "1399994063851229284",
+      "name": "woodcutting",
+      "animated": false
+    },
+    "url": "https://youtu.be/5gVYGnKwzao"
+  }
+]

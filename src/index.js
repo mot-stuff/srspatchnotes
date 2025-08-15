@@ -3,6 +3,9 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { handleCommitsCommand, buildPatchNotesEmbed, owner, repo } = require("./commands/commits");
+const { handleClearCommand } = require("./commands/clear");
+const { handleVideosCommand, handleVideoSelection, handlePageNavigation } = require("./commands/videos");
+const { handleAddVideo, handleUpdateVideo, handleRemoveVideo, handleListVideos } = require("./commands/video-management");
 const { getLatestMergedDevToMainPR } = require("./utils/github");
 
 const CHANNEL_ID = "1233610419424329728";
@@ -83,9 +86,41 @@ client.on("ready", async () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-    if (!interaction.isCommand()) return;
-    if (interaction.commandName === "patchnotes" || interaction.commandName === "commits") {
-        await handleCommitsCommand(interaction);
+    // Handle slash commands
+    if (interaction.isCommand()) {
+        if (interaction.commandName === "patchnotes" || interaction.commandName === "commits") {
+            await handleCommitsCommand(interaction);
+        } else if (interaction.commandName === "clear") {
+            await handleClearCommand(interaction);
+        } else if (interaction.commandName === "videos") {
+            await handleVideosCommand(interaction);
+        } else if (interaction.commandName === "add-video") {
+            await handleAddVideo(interaction);
+        } else if (interaction.commandName === "update-video") {
+            await handleUpdateVideo(interaction);
+        } else if (interaction.commandName === "remove-video") {
+            await handleRemoveVideo(interaction);
+        } else if (interaction.commandName === "list-videos") {
+            await handleListVideos(interaction);
+        }
+    }
+    // Handle select menu interactions
+    else if (interaction.isStringSelectMenu()) {
+        if (interaction.customId.startsWith("videos_select_")) {
+            await handleVideoSelection(interaction);
+        }
+    }
+    // Handle button interactions  
+    else if (interaction.isButton()) {
+        if (interaction.customId === "action:858375885") {
+            // Send just the URL so Discord auto-embeds it
+            await interaction.reply({
+                content: "https://www.youtube.com/@SafeRSBots", // Replace with actual YouTube URL
+                ephemeral: true
+            });
+        } else if (interaction.customId.startsWith("videos_prev_") || interaction.customId.startsWith("videos_next_")) {
+            await handlePageNavigation(interaction);
+        }
     }
 });
 

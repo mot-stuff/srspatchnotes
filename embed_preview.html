@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeRS Videos Embed Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #36393f;
+            color: #dcddde;
+            padding: 20px;
+            line-height: 1.375;
+        }
+
+        .discord-message {
+            background-color: #36393f;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .embed {
+            background-color: #2f3136;
+            border-left: 4px solid #000000;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 8px 0;
+            position: relative;
+        }
+
+        .embed-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .embed-description {
+            font-size: 14px;
+            color: #dcddde;
+            margin-bottom: 16px;
+            line-height: 1.375;
+        }
+
+        .embed-thumbnail {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+        }
+
+        .components {
+            margin-top: 16px;
+        }
+
+        .action-row {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            background-color: #5865f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background-color: #4752c4;
+        }
+
+        .button.secondary {
+            background-color: #4f545c;
+            color: #ffffff;
+        }
+
+        .button.secondary:hover {
+            background-color: #6d7075;
+        }
+
+        .button:disabled {
+            background-color: #4f545c;
+            color: #72767d;
+            cursor: not-allowed;
+        }
+
+        .select-menu {
+            background-color: #40444b;
+            border: 1px solid #202225;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 14px;
+            color: #b9bbbe;
+            width: 100%;
+            cursor: pointer;
+            appearance: none;
+            position: relative;
+        }
+
+        .select-menu:after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            pointer-events: none;
+        }
+
+        .preview-controls {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .preview-controls h2 {
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #b9bbbe;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .control-group input, .control-group select {
+            background-color: #40444b;
+            border: 1px solid #202225;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #ffffff;
+            width: 100%;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #5865f2;
+        }
+
+        .video-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #40444b;
+            border: 1px solid #202225;
+            border-radius: 4px;
+            padding: 8px;
+        }
+
+        .video-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            background-color: #36393f;
+        }
+
+        .video-item span {
+            margin-left: 8px;
+        }
+
+        .page-info {
+            text-align: center;
+            color: #72767d;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .add-video-btn {
+            background-color: #3ba55d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .add-video-btn:hover {
+            background-color: #2d7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-controls">
+        <h2>🎨 Embed Preview Controls</h2>
+        
+        <div class="control-group">
+            <label>Current Page</label>
+            <select id="pageSelect" onchange="updatePreview()">
+                <option value="0">Page 1</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Videos on Current Page</label>
+            <div id="videoList" class="video-list"></div>
+            <div class="page-info" id="pageInfo"></div>
+        </div>
+
+        <div class="control-group">
+            <label>Add New Video</label>
+            <input type="text" id="newVideoName" placeholder="Video Name" style="margin-bottom: 8px;">
+            <input type="text" id="newVideoEmoji" placeholder="Emoji (e.g., ⚔️)" style="margin-bottom: 8px;">
+            <input type="text" id="newVideoUrl" placeholder="Video URL" style="margin-bottom: 8px;">
+            <button class="add-video-btn" onclick="addVideo()">Add Video</button>
+        </div>
+    </div>
+
+    <div class="discord-message">
+        <div class="embed">
+            <img class="embed-thumbnail" src="https://message.style/cdn/images/f4de21d98bb597758115d76ec6c302130061f7c132535e43a1fd3167a692a0ff.png" alt="SafeRS Logo">
+            
+            <div class="embed-title">SafeRS | Example Videos</div>
+            <div class="embed-description">Select a script from one of the dropdowns below to view it's example video. (Videos currently being updated)</div>
+            
+            <div class="components">
+                                 <div class="action-row" id="buttonRow">
+                     <a href="https://example.com/overview" class="button" style="background-color: #5865f2;">📺 Overview Video</a>
+                     <button class="button" style="background-color: #ed4245;">🎬 YouTube Channel</button>
+                 </div>
+                <div class="action-row">
+                    <select class="select-menu" id="videoSelect">
+                        <option value="">Choose a Script</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample video data - matches your original exactly
+        let videoData = [
+            {
+                label: "Gemstone Crabs",
+                value: "action:531065172",
+                description: "Click this to get a link to the video!",
+                emoji: "⚔️", // Showing as ⚔️ since custom emojis don't work in HTML
+                url: "https://example.com/gemstone-crabs"
+            },
+            {
+                label: "Guardians of the Rift",
+                value: "action:677786165", 
+                description: "Click this to get a link to the video!",
+                emoji: "", // No emoji like original
+                url: "https://example.com/guardians-rift"
+            }
+        ];
+
+        const ITEMS_PER_PAGE = 20;
+        let currentPage = 0;
+
+        function getTotalPages() {
+            return Math.ceil(videoData.length / ITEMS_PER_PAGE);
+        }
+
+        function getPageVideos(page) {
+            const startIndex = page * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, videoData.length);
+            return videoData.slice(startIndex, endIndex);
+        }
+
+        function updatePreview() {
+            const pageSelect = document.getElementById('pageSelect');
+            currentPage = parseInt(pageSelect.value);
+            
+            const pageVideos = getPageVideos(currentPage);
+            const totalPages = getTotalPages();
+            
+            // Update select menu
+            const videoSelect = document.getElementById('videoSelect');
+            videoSelect.innerHTML = '<option value="">Choose a Script</option>';
+            
+                         pageVideos.forEach(video => {
+                 const option = document.createElement('option');
+                 option.value = video.value;
+                 option.textContent = video.emoji ? `${video.emoji} ${video.label}` : video.label;
+                 videoSelect.appendChild(option);
+             });
+
+            // Update pagination buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage >= totalPages - 1;
+            pageIndicator.textContent = `${currentPage + 1}/${totalPages}`;
+            
+            // Update video list display
+            const videoList = document.getElementById('videoList');
+            videoList.innerHTML = '';
+            
+                         pageVideos.forEach(video => {
+                 const item = document.createElement('div');
+                 item.className = 'video-item';
+                 item.innerHTML = video.emoji ? 
+                     `<span style="font-size: 16px;">${video.emoji}</span><span>${video.label}</span>` :
+                     `<span>${video.label}</span>`;
+                 videoList.appendChild(item);
+             });
+
+            // Update page info
+            const pageInfo = document.getElementById('pageInfo');
+            pageInfo.textContent = `Showing ${pageVideos.length} videos on page ${currentPage + 1} of ${totalPages}`;
+            
+            // Show/hide pagination buttons based on page count
+            const buttonRow = document.getElementById('buttonRow');
+            const paginationButtons = [prevBtn, pageIndicator, nextBtn];
+            
+            if (totalPages <= 1) {
+                paginationButtons.forEach(btn => btn.style.display = 'none');
+            } else {
+                paginationButtons.forEach(btn => btn.style.display = 'inline-flex');
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                document.getElementById('pageSelect').value = currentPage;
+                updatePreview();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = getTotalPages();
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                document.getElementById('pageSelect').value = currentPage;
+                updatePreview();
+            }
+        }
+
+        function addVideo() {
+            const name = document.getElementById('newVideoName').value.trim();
+            const emoji = document.getElementById('newVideoEmoji').value.trim();
+            const url = document.getElementById('newVideoUrl').value.trim();
+            
+            if (!name || !emoji || !url) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const newVideo = {
+                label: name,
+                value: name.toLowerCase().replace(/\s+/g, '_'),
+                description: "Click this to get a link to the video!",
+                emoji: emoji,
+                url: url
+            };
+            
+            videoData.push(newVideo);
+            
+            // Clear inputs
+            document.getElementById('newVideoName').value = '';
+            document.getElementById('newVideoEmoji').value = '';
+            document.getElementById('newVideoUrl').value = '';
+            
+            // Update page selector
+            updatePageSelector();
+            updatePreview();
+        }
+
+        function updatePageSelector() {
+            const pageSelect = document.getElementById('pageSelect');
+            const totalPages = getTotalPages();
+            
+            pageSelect.innerHTML = '';
+            for (let i = 0; i < totalPages; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Page ${i + 1}`;
+                pageSelect.appendChild(option);
+            }
+            
+            pageSelect.value = currentPage;
+        }
+
+        // Initialize
+        updatePageSelector();
+        updatePreview();
+    </script>
+</body>
+</html> 
